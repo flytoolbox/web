@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fly Fishing Toolbox — Your Digital Fishing Companion</title>
+  <meta name="description" content="Fly Fishing Toolbox (FFT): leader calculators, gear checklists, fishing log, offline by design. Free & Pro." />
+  <style>
+    :root{
+      --bg:#0f1f26;          /* deep river blue */
+      --bg-2:#0b171c;        /* darker header */
+      --surface:#102833;     /* card background */
+      --surface-2:#0f2430;
+      --primary:#1F4E5F;     /* Tony's brand teal */
+      --primary-2:#2f6c81;
+      --accent:#ffb851;      /* warm sunrise */
+      --text:#e6f1f5;
+      --muted:#a8c0c9;
+      --ok:#5ce0a3;
+      --danger:#ff6b6b;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius-lg: 28px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0; padding:0; background:linear-gradient(180deg,var(--bg),#0d2028 40%, #0b1a21); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+    a{color:inherit; text-decoration:none}
+    img{max-width:100%; display:block}
+
+    /* Layout helpers */
+    .container{max-width:1200px; margin:0 auto; padding:0 20px}
+    .grid{display:grid; gap:22px}
+
+    /* Header */
+    header{
+      position:sticky; top:0; z-index:50; backdrop-filter:saturate(160%) blur(8px);
+      background:linear-gradient(180deg, rgba(13,28,34,.88), rgba(13,28,34,.55));
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav{display:flex; align-items:center; justify-content:space-between; height:64px}
+    .brand{display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.3px}
+    .logo{width:34px; height:34px; border-radius:50%; background:radial-gradient(circle at 35% 35%, var(--accent), #f08c30 40%, var(--primary) 70%, #0e2a36 100%); box-shadow: inset 0 0 20px rgba(0,0,0,.35)}
+    .navlinks{display:flex; gap:22px}
+    .nav a{opacity:.9}
+    .nav a:hover{opacity:1; text-decoration:underline}
+    .btn{display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,var(--primary),var(--primary-2)); padding:12px 16px; border-radius:14px; border:1px solid rgba(255,255,255,.06); box-shadow: var(--shadow); font-weight:600}
+    .btn:hover{filter:brightness(1.05)}
+    .btn--ghost{background:transparent; border:1px solid rgba(255,255,255,.18)}
+
+    /* Mobile nav */
+    #menuToggle{display:none}
+    .hamburger{display:none; background:transparent; border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:8px 10px}
+    @media (max-width:860px){
+      .navlinks{display:none}
+      .hamburger{display:inline-flex}
+      #menuToggle:checked + .navlinks{display:flex; position:absolute; left:16px; right:16px; top:68px; flex-direction:column; background:var(--surface); padding:16px; border-radius:14px; box-shadow:var(--shadow)}
+    }
+
+    /* Hero */
+    .hero{position:relative; overflow:hidden}
+    .hero .inner{display:grid; grid-template-columns:1.15fr .85fr; gap:30px; align-items:center; padding:72px 0}
+    .kicker{color:var(--accent); text-transform:uppercase; letter-spacing:.2em; font-weight:700; font-size:.85rem}
+    h1{font-size:clamp(28px, 4.5vw, 54px); line-height:1.04; margin:.3em 0 .4em}
+    .sub{color:var(--muted); font-size:clamp(15px, 1.4vw, 18px)}
+    .cta{display:flex; gap:14px; margin-top:22px; flex-wrap:wrap}
+    .badge{display:inline-flex; align-items:center; gap:10px; background:#0d2430; border:1px solid rgba(255,255,255,.1); padding:10px 14px; border-radius:12px}
+
+    .heroArt{position:relative; height:420px; border-radius:var(--radius-lg); background: radial-gradient(1200px 420px at 10% 120%, rgba(31,78,95,.7), transparent),
+                             radial-gradient(1200px 420px at 110% -20%, rgba(255,184,81,.18), transparent),
+                             linear-gradient(135deg, #0e2a36, #143847 70%, #0f2631);
+               box-shadow: var(--shadow);}
+    .heroArt svg{position:absolute; inset:0; width:100%; height:100%;}
+    .waterline{stroke:#74d0ff; stroke-opacity:.5}
+
+    @media (max-width:980px){
+      .hero .inner{grid-template-columns:1fr; padding:56px 0}
+      .heroArt{height:340px}
+    }
+
+    /* Features */
+    section{padding:70px 0}
+    h2{font-size:clamp(22px,3.2vw,36px); margin:0 0 10px}
+    .lead{color:var(--muted); margin:0 0 28px}
+    .cards{grid-template-columns:repeat(4,1fr)}
+    .card{background:linear-gradient(180deg,var(--surface),var(--surface-2)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); min-height:158px}
+    .icon{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, rgba(255,184,81,.35), rgba(255,184,81,.1)); display:grid; place-items:center; margin-bottom:10px}
+    .icon svg{opacity:.95}
+    @media (max-width:1000px){.cards{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.cards{grid-template-columns:1fr}}
+
+    /* Comparison */
+    .tableWrap{overflow:auto; background:linear-gradient(180deg,var(--surface),var(--surface-2)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); box-shadow:var(--shadow)}
+    table{width:100%; border-collapse:collapse; min-width:640px}
+    th,td{padding:16px 18px; text-align:left}
+    thead th{position:sticky; top:0; background:rgba(255,255,255,.04); letter-spacing:.02em}
+    tbody tr:not(:last-child) td{border-bottom:1px solid rgba(255,255,255,.06)}
+    .check{color:var(--ok); font-weight:700}
+    .x{color:var(--danger); font-weight:700}
+
+    /* About */
+    .about{grid-template-columns:1.1fr .9fr; align-items:center}
+    .portrait{height:280px; border-radius:var(--radius-lg); background:linear-gradient(135deg,#0e2a36,#173d4d); position:relative; box-shadow:var(--shadow)}
+    .rod{position:absolute; left:12%; top:52%; width:76%; height:2px; background:linear-gradient(90deg, #f6c27a, #c18a3f); transform:rotate(-8deg); box-shadow:0 0 10px rgba(246,194,122,.35)}
+    .line{position:absolute; left:65%; top:36%; width:26%; height:26%; border-left:2px dashed #74d0ff; border-bottom:2px dashed #74d0ff; border-radius:0 0 80% 0}
+
+    @media (max-width:940px){.about{grid-template-columns:1fr}}
+
+    /* Screenshots */
+    .phones{grid-template-columns:repeat(3,1fr)}
+    .phone{height:440px; border-radius:28px; padding:12px; background:linear-gradient(180deg,#0b1418,#0f2733); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow); position:relative}
+    .screen{height:100%; border-radius:20px; background:linear-gradient(180deg, #1f4e5f, #1a3f4d 55%, #0d2430); border:1px solid rgba(255,255,255,.08)}
+    .notch{position:absolute; left:50%; transform:translateX(-50%); top:8px; width:88px; height:14px; background:#0b1418; border-radius:0 0 12px 12px; border:1px solid rgba(255,255,255,.06)}
+    @media (max-width:1000px){.phones{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.phones{grid-template-columns:1fr}}
+
+    /* FAQ */
+    details{background:linear-gradient(180deg,var(--surface),var(--surface-2)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:16px 18px}
+    details summary{cursor:pointer; font-weight:600}
+    details[open]{outline:1px solid rgba(255,255,255,.12)}
+
+    /* Blog */
+    .blog{grid-template-columns:repeat(3,1fr)}
+    .post{background:linear-gradient(180deg,var(--surface),var(--surface-2)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow)}
+    .post .thumb{height:160px; background:linear-gradient(135deg, rgba(31,78,95,.35), rgba(255,184,81,.2)), linear-gradient(180deg,#0d2430,#153848)}
+    .post .body{padding:16px}
+
+    @media (max-width:1000px){.blog{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.blog{grid-template-columns:1fr}}
+
+    /* CTA Banner */
+    .ctaBanner{background:linear-gradient(90deg, rgba(31,78,95,.55), rgba(255,184,81,.25)); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-lg); padding:26px; display:flex; align-items:center; justify-content:space-between; gap:18px; box-shadow:var(--shadow)}
+    .ctaBanner p{margin:0; font-size:1.1rem}
+    @media (max-width:780px){.ctaBanner{flex-direction:column; align-items:flex-start}}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.08); padding:28px 0; color:var(--muted)}
+    .social{display:flex; gap:14px}
+    .muted{color:var(--muted)}
+
+    /* Utilities */
+    .center{display:flex; align-items:center; justify-content:center}
+    .pill{display:inline-block; padding:6px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.04)}
+    .spacer{height:14px}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <a href="#home" aria-label="Fly Fishing Toolbox Home">Fly Fishing Toolbox</a>
+      </div>
+
+      <label class="hamburger" for="menuToggle" aria-label="Toggle Menu">☰</label>
+      <input type="checkbox" id="menuToggle" hidden>
+
+      <nav class="navlinks" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#compare">Compare</a>
+        <a href="#about">About</a>
+        <a href="#help">Help</a>
+        <a href="#blog">Blog</a>
+        <a class="btn btn--ghost" href="#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="home" class="hero">
+    <div class="container inner">
+      <div>
+        <div class="kicker">Offline by design</div>
+        <h1>Your fly fishing companion — anywhere, anytime.</h1>
+        <p class="sub">Leader calculators, gear checklists, AFFTA sizing, and a fishing log that works with or without reception.</p>
+        <div class="cta">
+          <a class="btn" href="#download" aria-label="Download Free">📲 Download Free</a>
+          <a class="btn btn--ghost" href="#compare" aria-label="Upgrade to Pro">⭐ Upgrade to Pro</a>
+          <span class="badge" title="No sign-up required">🔒 No sign‑up • No cloud</span>
+        </div>
+      </div>
+      <div class="heroArt" aria-label="Hero illustration: river sunrise with casting line">
+        <!-- Subtle water lines and casting arc -->
+        <svg viewBox="0 0 800 420" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="sun" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#ffb851" stop-opacity=".9"/>
+              <stop offset="100%" stop-color="#ffb851" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <circle cx="660" cy="80" r="80" fill="url(#sun)"/>
+          <path class="waterline" d="M0 300 Q 120 295 240 300 T 480 300 T 720 300" fill="none" stroke-width="2"/>
+          <path class="waterline" d="M0 328 Q 140 325 280 328 T 560 328 T 840 328" fill="none" stroke-width="1.5"/>
+          <path class="waterline" d="M0 352 Q 100 350 200 352 T 400 352 T 800 352" fill="none" stroke-width="1.2"/>
+          <path d="M180 210 C 240 150, 340 120, 520 160" fill="none" stroke="#74d0ff" stroke-width="2" stroke-dasharray="6 6" opacity=".85"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Snapshot -->
+  <section id="features">
+    <div class="container">
+      <h2>Core features</h2>
+      <p class="lead">Everything you need for a smoother day on the water.</p>
+      <div class="grid cards">
+        <div class="card">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12c0-4 3-7 7-7s7 3 7 7" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="12" r="2" fill="currentColor"/></svg>
+          </div>
+          <h3>Leader Calculator</h3>
+          <p class="muted">Build basic & advanced leaders with clear step‑by‑step guidance.</p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="2"/><path d="M8 9h8M8 13h8M8 17h6" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <h3>Gear Checklists</h3>
+          <p class="muted">Never forget tippet, nippers, or spare leaders again.</p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v18M5 8h14" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <h3>AFFTA & Line Sizing</h3>
+          <p class="muted">Understand rod/line ratings and match setups quickly.</p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="2"/><path d="M7 9h10M7 13h10M7 17h6" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <h3>Offline by Design</h3>
+          <p class="muted">Works anywhere. No sign‑up. No reception required.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compare -->
+  <section id="compare">
+    <div class="container">
+      <h2>Free vs Pro</h2>
+      <p class="lead">Start free. Upgrade when you're ready.</p>
+      <div class="tableWrap">
+        <table aria-describedby="compare">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Free</th>
+              <th>Pro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Basic Leader Calculator</td>
+              <td class="check">✓</td>
+              <td class="check">✓</td>
+            </tr>
+            <tr>
+              <td>Advanced Leaders (multi‑discipline)</td>
+              <td class="x">—</td>
+              <td class="check">✓</td>
+            </tr>
+            <tr>
+              <td>Save & Load Profiles</td>
+              <td class="x">—</td>
+              <td class="check">✓</td>
+            </tr>
+            <tr>
+              <td>Export / Import & Share</td>
+              <td class="x">—</td>
+              <td class="check">✓</td>
+            </tr>
+            <tr>
+              <td>Fishing Log</td>
+              <td class="x">—</td>
+              <td class="check">✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="spacer"></div>
+      <a class="btn" href="#download">⭐ Go Pro</a>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="container grid about">
+      <div>
+        <h2>Built by an angler, for anglers</h2>
+        <p class="lead">Hi, I'm Tony. I built Fly Fishing Toolbox to cut through the confusion around leaders, line ratings, and on‑water prep — so you can focus on the cast, not the calculations.</p>
+        <ul>
+          <li>Simple explanations of AFFTA, mono vs fluoro, and leader design</li>
+          <li>Carefully chosen defaults so beginners feel confident fast</li>
+          <li>Privacy‑first: your data stays on your device</li>
+        </ul>
+        <div class="spacer"></div>
+        <a class="btn btn--ghost" href="#help">Read the Help Guides</a>
+      </div>
+      <div class="portrait" aria-label="Abstract fishing portrait">
+        <div class="rod" aria-hidden="true"></div>
+        <div class="line" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots & Demo -->
+  <section id="screens">
+    <div class="container">
+      <h2>See it in action</h2>
+      <p class="lead">A clean interface that works on and off the grid.</p>
+      <div class="grid phones">
+        <div class="phone">
+          <div class="notch" aria-hidden="true"></div>
+          <div class="screen center">
+            <span class="pill">Leader Calculator</span>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="notch" aria-hidden="true"></div>
+          <div class="screen center">
+            <span class="pill">Gear Checklist</span>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="notch" aria-hidden="true"></div>
+          <div class="screen center">
+            <span class="pill">Fishing Log (Pro)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Help / FAQ -->
+  <section id="help">
+    <div class="container">
+      <h2>Help & FAQs</h2>
+      <p class="lead">Quick answers to common questions.</p>
+      <div class="grid" style="grid-template-columns:1fr; gap:14px">
+        <details>
+          <summary>Does the app work offline?</summary>
+          <p>Yes. FFT is offline by design. No account, no reception required. Your data is stored locally on your device.</p>
+        </details>
+        <details>
+          <summary>How do I export or back up my data?</summary>
+          <p>In the Pro version, open <em>About → Export/Import</em> to save an encrypted backup file. Keep copies on another device or cloud drive for safety.</p>
+        </details>
+        <details>
+          <summary>What is the AFFTA line rating?</summary>
+          <p>AFFTA is a standard that maps fly line weights (e.g. 5‑wt) to actual grain weights, so you can match line and rod properly.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog / News -->
+  <section id="blog">
+    <div class="container">
+      <h2>Latest posts</h2>
+      <p class="lead">Tips, updates, and stories from the water.</p>
+      <div class="grid blog">
+        <article class="post">
+          <div class="thumb" aria-hidden="true"></div>
+          <div class="body">
+            <h3>Understanding Mono vs Fluoro Leaders</h3>
+            <p class="muted">When to choose each, and how diameter affects turnover and stealth.</p>
+          </div>
+        </article>
+        <article class="post">
+          <div class="thumb" aria-hidden="true"></div>
+          <div class="body">
+            <h3>Top 5 Gear Checklist Essentials</h3>
+            <p class="muted">Small items that save a day on the river — and how to pack them.</p>
+          </div>
+        </article>
+        <article class="post">
+          <div class="thumb" aria-hidden="true"></div>
+          <div class="body">
+            <h3>Behind the Scenes: FFT v1.2</h3>
+            <p class="muted">A quick look at the newest improvements and what’s next.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section id="download">
+    <div class="container">
+      <div class="ctaBanner">
+        <p><strong>Ready to simplify your next trip?</strong> Download the free app now, and upgrade to Pro anytime.</p>
+        <div class="cta">
+          <a class="btn" href="#">📲 Get it on Google Play</a>
+          <a class="btn btn--ghost" href="#compare">See Pro features</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
+      <small>© 2025 Fly Fishing Toolbox. Built by anglers, for anglers.</small>
+      <div class="social" aria-label="Social links">
+        <a class="muted" href="#" aria-label="TikTok">TikTok</a>
+        <a class="muted" href="#" aria-label="Facebook">Facebook</a>
+        <a class="muted" href="#" aria-label="YouTube">YouTube</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
